@@ -38,6 +38,9 @@ details summary{cursor:pointer;font-weight:600}
 <div><label>출장지 (주소 또는 기관명)</label><input id="dest" placeholder="예: 광주광역시 서구 …"></div>
 <div><label>근무지 소재 시·군</label><select id="schoolCity"></select></div>
 <div><label>출장지 소재 시·군/시·도</label><select id="destCity"></select></div>
+<div><label>출발 일시</label><input id="startDt" type="datetime-local"></div>
+<div><label>복귀 일시</label><input id="endDt" type="datetime-local"></div>
+<div style="grid-column:1/-1" class="small" id="dtInfo">출발·복귀 일시를 입력하면 일수, 숙박 박수, 근무지 내 출장 시간이 자동으로 채워집니다.</div>
 <div><label>출장 일수 (일)</label><input id="days" type="number" min="1" value="1"></div>
 <div><label>숙박 (박)</label><input id="nights" type="number" min="0" value="0"></div>
 <div><label>근무지 내 출장 시간</label><select id="hours"><option value="4">4시간 이상</option><option value="0">4시간 미만</option></select></div>
@@ -178,6 +181,21 @@ $("btnKakao").onclick=async()=>{
   $("km").value=km.toFixed(1);m.textContent=`${a.place_name} → ${b.place_name}: 자동차 경로 약 ${km.toFixed(1)}km, 예상 소요 시간 약 ${dur} (편도, 교통상황 미반영 가능). 운임은 직접 입력하거나 추정 계산을 선택하세요.`;calc();
  }catch(e){m.textContent="자동 조회 실패: "+e.message+" (키·도메인 설정이나 브라우저 제한 때문일 수 있습니다. 거리를 직접 입력하세요.)"}
 };
+function syncDates(){
+ const s=$("startDt").value,e=$("endDt").value,info=$("dtInfo");
+ if(!s||!e){info.textContent="출발·복귀 일시를 입력하면 일수, 숙박 박수, 근무지 내 출장 시간이 자동으로 채워집니다.";return}
+ const a=new Date(s),b=new Date(e);
+ if(isNaN(a)||isNaN(b)){return}
+ if(b<=a){info.textContent="복귀 일시가 출발 일시보다 늦어야 합니다.";return}
+ const day0=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+ const diff=Math.round((day0(b)-day0(a))/86400000);
+ const mins=Math.round((b-a)/60000);
+ $("days").value=diff+1;$("nights").value=diff;
+ $("hours").value=mins>=240?"4":"0";
+ info.textContent=`총 ${Math.floor(mins/60)}시간 ${mins%60}분 → ${diff+1}일, ${diff}박으로 자동 계산했습니다. (필요하면 아래 값을 직접 수정할 수 있습니다.)`;
+ calc();
+}
+$("startDt").addEventListener("input",syncDates);$("endDt").addEventListener("input",syncDates);
 function gasUpdateLink(){const q=($("dest").value||regions[$("destCity").value].n)+" 주유소";$("gasLink").href="https://map.kakao.com/?q="+encodeURIComponent(q)}
 $("dest").addEventListener("input",gasUpdateLink);$("destCity").addEventListener("input",gasUpdateLink);
 $("btnGas").onclick=async()=>{
