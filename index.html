@@ -173,8 +173,9 @@ $("btnKakao").onclick=async()=>{
   const a=await geo($("school").value),b=await geo($("dest").value);
   const r=await fetch(`https://apis-navi.kakaomobility.com/v1/directions?origin=${a.x},${a.y}&destination=${b.x},${b.y}`,{headers:{Authorization:"KakaoAK "+S.kakaoKey}});
   if(!r.ok)throw new Error("길찾기 실패 "+r.status);
-  const j=await r.json(),km=j.routes[0].summary.distance/1000;
-  $("km").value=km.toFixed(1);m.textContent=`${a.place_name} → ${b.place_name}: 자동차 경로 약 ${km.toFixed(1)}km (편도). 운임은 직접 입력하거나 추정 계산을 선택하세요.`;calc();
+  const j=await r.json(),sm=j.routes[0].summary,km=sm.distance/1000;
+  const mins=Math.round((sm.duration||0)/60),dur=mins>=60?`${Math.floor(mins/60)}시간 ${mins%60}분`:`${mins}분`;
+  $("km").value=km.toFixed(1);m.textContent=`${a.place_name} → ${b.place_name}: 자동차 경로 약 ${km.toFixed(1)}km, 예상 소요 시간 약 ${dur} (편도, 교통상황 미반영 가능). 운임은 직접 입력하거나 추정 계산을 선택하세요.`;calc();
  }catch(e){m.textContent="자동 조회 실패: "+e.message+" (키·도메인 설정이나 브라우저 제한 때문일 수 있습니다. 거리를 직접 입력하세요.)"}
 };
 function gasUpdateLink(){const q=($("dest").value||regions[$("destCity").value].n)+" 주유소";$("gasLink").href="https://map.kakao.com/?q="+encodeURIComponent(q)}
