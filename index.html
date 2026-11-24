@@ -52,6 +52,7 @@ details summary{cursor:pointer;font-weight:600}
 <h2>2. 거리·운임</h2>
 <div class="row">
 <div style="flex:1;min-width:150px"><label>편도 거리(km)</label><input id="km" type="number" min="0" step="0.1" value="0"></div>
+<div style="flex:1;min-width:150px"><label>편도 예상 소요시간 (자동차)</label><input id="dur" type="text" readonly placeholder="거리 조회 후 표시" value=""></div>
 <div style="flex:1;min-width:150px"><label>편도 운임 (원) — 직접 입력</label><input id="fare" type="number" min="0" value="0"></div>
 <div><button class="sec" id="btnKakao" type="button">카카오 API로 거리 조회</button></div>
 </div>
@@ -182,6 +183,7 @@ $("btnKakao").onclick=async()=>{
   const sm=rt.summary;if(!sm||typeof sm.duration!=="number")throw new Error("응답에 소요 시간이 없습니다");
   const km=sm.distance/1000;
   const mins=Math.round(sm.duration/60),dur=mins>=60?`${Math.floor(mins/60)}시간 ${mins%60}분`:`${mins}분`;
+  $("dur").value=dur+(mins>0?` (왕복 약 ${(mins*2)>=60?Math.floor(mins*2/60)+"시간 "+(mins*2%60)+"분":mins*2+"분"})`:"");
   $("km").value=km.toFixed(1);m.textContent=`${a.place_name} → ${b.place_name}: 자동차 경로 약 ${km.toFixed(1)}km, 예상 소요 시간 약 ${dur} (편도, 교통상황 미반영 가능). 운임은 직접 입력하거나 추정 계산을 선택하세요.`;calc();
  }catch(e){m.textContent="자동 조회 실패: "+e.message+" (키·도메인 설정이나 브라우저 제한 때문일 수 있습니다. 거리를 직접 입력하세요.)"}
 };
