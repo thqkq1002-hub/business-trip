@@ -117,7 +117,7 @@ $("schoolCity").value=0;$("destCity").value=0;
 
 function renderSettings(){
  $("settings").innerHTML=Object.keys(DEF).map(k=>`<div><label>${LABELS[k]}</label><input data-k="${k}" type="${k==="kakaoKey"?"password":"number"}" value="${S[k]}"></div>`).join("");
- $("settings").querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{S[i.dataset.k]=i.type==="number"?Number(i.value)||0:i.value;calc()}));
+ $("settings").querySelectorAll("input").forEach(i=>i.addEventListener("input",()=>{S[i.dataset.k]=i.type==="number"?Number(i.value)||0:i.value;try{localStorage.setItem("yeobi",JSON.stringify(S))}catch(e){}calc()}));
 }
 $("btnSave").onclick=()=>{try{localStorage.setItem("yeobi",JSON.stringify(S));alert("저장했습니다.")}catch(e){alert("저장할 수 없습니다.")}};
 $("btnReset").onclick=()=>{S=Object.assign({},DEF);try{localStorage.removeItem("yeobi")}catch(e){}renderSettings();calc()};
